@@ -1,14 +1,14 @@
-import {useContext} from 'react';
-import {useDispatch} from 'react-redux';
-import {resetAuth} from '../redux/auth';
-import {Storage} from '../assets/services/storage.service';
-import {SignInContext} from '../contexts/authContext';
+import { useContext } from 'react';
+import { useDispatch } from 'react-redux';
+import { resetAuth } from '../redux/auth';
+import { Storage } from '../assets/services/storage.service';
+import { SignInContext } from '../contexts/authContext';
 
 export const useDisconnected = () => {
   //
 
   const dispatch = useDispatch();
-  const {setIsConnect} = useContext(SignInContext);
+  const { setIsConnect } = useContext(SignInContext);
 
   const handleDisconnected = async () => {
     await Storage.removeItem('token');
@@ -18,5 +18,5 @@ export const useDisconnected = () => {
     setIsConnect(false);
   };
 
-  return {handleDisconnected};
+  return { handleDisconnected };
 };

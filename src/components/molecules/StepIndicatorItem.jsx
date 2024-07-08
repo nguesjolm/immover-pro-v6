@@ -1,12 +1,12 @@
-import {StyleSheet, View} from 'react-native';
-import React, {Fragment} from 'react';
-import {THEME} from '../../styles/theme';
-import {hp, wp} from '../../assets/utils/helperResponsive';
-import {TextVariant} from '../atoms/TextVariant';
+import { StyleSheet, View } from 'react-native';
+import React, { Fragment } from 'react';
+import { THEME } from '../../styles/theme';
+import { hp, wp } from '../../assets/utils/helperResponsive';
+import { TextVariant } from '../atoms/TextVariant';
 
-export const StepIndicatorItem = ({currentStep}) => (
+export const StepIndicatorItem = ({ currentStep }) => (
   <View style={styles.stepContainer}>
-    {[1, 2, 3].map(step => (
+    {[1, 2, 3].map((step) => (
       <Fragment key={step}>
         {step !== 1 && (
           <View
@@ -29,7 +29,8 @@ export const StepIndicatorItem = ({currentStep}) => (
               backgroundColor:
                 step <= currentStep ? THEME.colors.primary : THEME.colors.gray,
             },
-          ]}>
+          ]}
+        >
           <TextVariant
             variant={'title5'}
             color={THEME.colors.white}
@@ -56,6 +57,9 @@ const styles = StyleSheet.create({
     width: wp('6%'),
     height: wp('6%'),
     borderRadius: 100,
+    flexDirection: 'row',
+    justifyContent: 'center',
+    alignItems: 'center',
   },
   step: {
     width: wp('5'),

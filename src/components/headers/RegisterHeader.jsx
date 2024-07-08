@@ -37,7 +37,7 @@ const styles = StyleSheet.create({
   curveRight: {
     backgroundColor: THEME.colors.primary,
     width: hp('40%'),
-    height: hp('100%'),
+    height: hp('90%'),
     position: 'absolute',
     alignSelf: 'flex-start',
     zIndex: 0,

@@ -85,7 +85,7 @@ const styles = StyleSheet.create({
   curveRight: {
     backgroundColor: THEME.colors.primary,
     width: 200,
-    height: '100%',
+    height: '90%',
     position: 'absolute',
     zIndex: 0,
   },

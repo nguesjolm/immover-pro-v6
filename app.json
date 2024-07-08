@@ -2,7 +2,7 @@
   "expo": {
     "name": "ImmOver Pro",
     "slug": "immover-pro",
-    "version": "2.1.0",
+    "version": "2.1.8",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "light",
@@ -11,31 +11,34 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": [
-      "**/*"
-    ],
+    "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.mpyatech.immoverpro",
-      "buildNumber": "23"
+      "buildNumber": "32",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Autoriser l'application à accéder à votre camera pour prendre des photos de votre profil et de vos biens immobiliers"
+      }
+    },
+    "androidStatusBar": {
+      "backgroundColor": "#D14D31",
+      "translucent": false
     },
     "android": {
       "package": "com.mpyatech.immoverpro",
-      "versionCode": 23,
+      "versionCode": 32,
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "permissions": [
-        "android.permission.RECORD_AUDIO"
-      ]
+      "permissions": ["android.permission.RECORD_AUDIO"]
     },
     "plugins": [
       [
         "expo-image-picker",
         {
-          "photosPermission": "Autoriser $(PRODUCT_NAME) à accéder à votre photo",
-          "cameraPermission": "Autoriser $(PRODUCT_NAME) à accéder à votre photo"
+          "photosPermission": "Autoriser l'application à accéder à votre camera pour prendre des photos de votre profil et de vos biens immobiliers",
+          "cameraPermission": "Autoriser l'application à accéder à votre camera pour prendre des photos de votre profil et de vos biens immobiliers"
         }
       ],
       [
@@ -45,8 +48,8 @@
             "usesCleartextTraffic": true
           },
           "ios": {
-            "NSCameraUsageDescription": "Autoriser $(PRODUCT_NAME) à accéder à votre appareil photo",
-            "NSPhotoLibraryUsageDescription": "Autoriser $(PRODUCT_NAME) à accéder à votre photo"
+            "NSCameraUsageDescription": "Autoriser l'application à accéder à votre camera pour prendre des photos de votre profil et de vos biens immobiliers",
+            "NSPhotoLibraryUsageDescription": "Autoriser l'application à accéder à votre camera pour prendre des photos de votre profil et de vos biens immobiliers"
           }
         }
       ]
@@ -56,7 +59,7 @@
     },
     "extra": {
       "eas": {
-        "projectId": "63b56d02-a7df-48e2-ab57-8470df9baaeb"
+        "projectId": "9b025515-8eb5-4f06-9f59-e52804014371"
       }
     },
     "runtimeVersion": {

@@ -64,11 +64,11 @@
 //   });
 // };
 
-import { Platform } from "react-native";
-import * as Device from "expo-device";
-import * as Notifications from "expo-notifications";
-import Constants from "expo-constants";
-import { Storage } from "../services/storage.service";
+import { Platform } from 'react-native';
+import * as Device from 'expo-device';
+import * as Notifications from 'expo-notifications';
+import Constants from 'expo-constants';
+import { Storage } from '../services/storage.service';
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -81,47 +81,48 @@ Notifications.setNotificationHandler({
 // Demander la permission à l'utilisateur
 export const requestUserPermission = async () => {
   const { status } = await Notifications.requestPermissionsAsync();
-  if (status === "granted") {
-    console.log("Permission accordée!");
+  if (status === 'granted') {
+    console.log('Permission accordée!');
     return registerForPushNotificationsAsync();
   } else {
-    console.log("Permission refusée.");
+    console.log('Permission refusée.');
     return null;
   }
 };
 
 const registerForPushNotificationsAsync = async () => {
-  let token = await Storage.getItem("pushToken");
+  let token = await Storage.getItem('pushToken');
 
   if (!token) {
-    if (Platform.OS === "android") {
-      Notifications.setNotificationChannelAsync("default", {
-        name: "default",
+    if (Platform.OS === 'android') {
+      Notifications.setNotificationChannelAsync('default', {
+        name: 'default',
         importance: Notifications.AndroidImportance.MAX,
         vibrationPattern: [0, 250, 250, 250],
-        lightColor: "#FF231F7C",
+        lightColor: '#FF231F7C',
       });
     }
     if (Device.isDevice) {
       const { status: existingStatus } =
         await Notifications.getPermissionsAsync();
       let finalStatus = existingStatus;
-      if (existingStatus !== "granted") {
+      if (existingStatus !== 'granted') {
         const { status } = await Notifications.requestPermissionsAsync();
         finalStatus = status;
       }
-      if (finalStatus !== "granted") {
-        alert("Failed to get push token for push notification!");
+      if (finalStatus !== 'granted') {
+        alert('Failed to get push token for push notification!');
         return;
       }
       token = await Notifications.getExpoPushTokenAsync({
         projectId: Constants.expoConfig.extra.eas.projectId,
       });
     } else {
-      alert("Must use physical device for Push Notifications");
+      return null;
+      // alert("Must use physical device for Push Notifications");
     }
 
-    await Storage.setItem("fcmToken", token.data);
+    await Storage.setItem('fcmToken', token.data);
     return token.data;
   }
 
@@ -131,10 +132,10 @@ const registerForPushNotificationsAsync = async () => {
 // Listen for incoming notifications
 export const NotificationListener = async () => {
   Notifications.addNotificationReceivedListener((notification) => {
-    console.log("Received notification", notification);
+    console.log('Received notification', notification);
   });
 
   Notifications.addNotificationResponseReceivedListener((response) => {
-    console.log("Response received", response);
+    console.log('Response received', response);
   });
 };

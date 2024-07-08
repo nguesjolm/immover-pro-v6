@@ -1,16 +1,16 @@
-import React, {useEffect} from 'react';
-import {Image, StyleSheet, View} from 'react-native';
-import {planet} from '../../styles/main.style';
-import {FileInput} from '../../components/atoms/FileInput';
-import {TextVariant} from '../../components/atoms/TextVariant';
-import {useDispatch, useSelector} from 'react-redux';
-import {setCniAction} from '../../redux/register';
+import React, { useEffect } from 'react';
+import { Image, StyleSheet, View } from 'react-native';
+import { planet } from '../../styles/main.style';
+import { FileInput } from '../../components/atoms/FileInput';
+import { TextVariant } from '../../components/atoms/TextVariant';
+import { useDispatch, useSelector } from 'react-redux';
+import { setCniAction } from '../../redux/register';
 
 export const ChooseProfileCard = () => {
   //
   const dispatch = useDispatch();
-  const identity = useSelector(s => s.registerState.identite);
-  const cni = useSelector(s => s.registerState.cni);
+  const identity = useSelector((s) => s.registerState.identite);
+  const cni = useSelector((s) => s.registerState.cni);
   const [file, setFile] = React.useState(null);
 
   useEffect(() => {
@@ -42,7 +42,7 @@ export const ChooseProfileCard = () => {
           <FileInput withCam={true} file={file} setFile={setFile} />
         </View>
 
-        {cni && <Image source={{uri: cni?.path}} style={styles.file} />}
+        {cni && <Image source={{ uri: cni?.path }} style={styles.file} />}
       </View>
     </View>
   );
@@ -55,8 +55,9 @@ const styles = StyleSheet.create({
   },
   file: {
     width: '100%',
-    height: 200,
-    resizeMode: 'stretch',
+    height: 250,
+    resizeMode: 'contain',
+    top: 10,
     borderRadius: 10,
   },
 });

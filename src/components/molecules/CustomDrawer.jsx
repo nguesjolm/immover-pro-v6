@@ -1,24 +1,25 @@
 import React from 'react';
-import {View, StyleSheet, Image} from 'react-native';
+import { View, StyleSheet, Image } from 'react-native';
 import {
   DrawerContentScrollView,
   DrawerItemList,
 } from '@react-navigation/drawer';
-import {THEME} from '../../styles/theme';
-import {hp, wp} from '../../assets/utils/helperResponsive';
-import {TextVariant} from '../atoms/TextVariant';
-import {ButtonGeneral} from '../atoms/ButtonGeneral';
-import {useDisconnected} from '../../hooks/useDisconnected';
+import { THEME } from '../../styles/theme';
+import { hp, wp } from '../../assets/utils/helperResponsive';
+import { TextVariant } from '../atoms/TextVariant';
+import { ButtonGeneral } from '../atoms/ButtonGeneral';
+import { useDisconnected } from '../../hooks/useDisconnected';
 
-const CustomDrawer = props => {
+const CustomDrawer = (props) => {
   //
-  const {handleDisconnected} = useDisconnected();
+  const { handleDisconnected } = useDisconnected();
 
   return (
-    <View style={{flex: 1}}>
+    <View style={{ flex: 1 }}>
       <DrawerContentScrollView
         {...props}
-        contentContainerStyle={styles.topContent}>
+        contentContainerStyle={styles.topContent}
+      >
         <View style={styles.imageContent}>
           <View style={styles.imageItem}>
             <TextVariant

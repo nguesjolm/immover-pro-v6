@@ -6,38 +6,38 @@ import {
   ScrollView,
   RefreshControl,
 } from 'react-native';
-import {THEME} from '../../../../styles/theme';
-import {AppHeader} from '../../../../components/headers/AppHeader';
-import {TextVariant} from '../../../../components/atoms/TextVariant';
-import {country, planet} from '../../../../styles/main.style';
-import {hp, wp} from '../../../../assets/utils/helperResponsive';
-import {useNavigation} from '@react-navigation/native';
-import {WellItemCard} from '../../../../components/molecules/WellItemCard';
-import {useRequests} from '../../../../hooks/useRequests';
-import {useFormatedRequests} from '../../../../hooks/useFormatedRequests';
-import {useDispatch} from 'react-redux';
+import { THEME } from '../../../../styles/theme';
+import { AppHeader } from '../../../../components/headers/AppHeader';
+import { TextVariant } from '../../../../components/atoms/TextVariant';
+import { country, planet } from '../../../../styles/main.style';
+import { hp, wp } from '../../../../assets/utils/helperResponsive';
+import { useNavigation } from '@react-navigation/native';
+import { WellItemCard } from '../../../../components/molecules/WellItemCard';
+import { useRequests } from '../../../../hooks/useRequests';
+import { useFormatedRequests } from '../../../../hooks/useFormatedRequests';
+import { useDispatch } from 'react-redux';
 import {
   setRequestDetailsAction,
   setRequestSelectedAction,
 } from '../../../../redux/requests';
-import {setProposedOfferedModalAction} from '../../../../redux/modals';
-import {useRefreshData} from '../../../../hooks/useRefreshData';
+import { setProposedOfferedModalAction } from '../../../../redux/modals';
+import { useRefreshData } from '../../../../hooks/useRefreshData';
 
 export const RequestHistoriesScreen = () => {
   //
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const {data, refetch} = useRequests();
-  const {allRequestsFormated} = useFormatedRequests(data);
-  const {isRefetchingByUser, refetchByUser} = useRefreshData(refetch);
+  const { data, refetch } = useRequests();
+  const { allRequestsFormated } = useFormatedRequests(data);
+  const { isRefetchingByUser, refetchByUser } = useRefreshData(refetch);
 
-  const handleDetails = detail => {
+  const handleDetails = (detail) => {
     dispatch(setRequestDetailsAction(detail));
     navigation.navigate('RequestDetails');
   };
 
   // propose offer
-  const handleProposeOffer = request => {
+  const handleProposeOffer = (request) => {
     dispatch(setProposedOfferedModalAction(true));
     dispatch(setRequestSelectedAction(request));
   };
@@ -66,12 +66,13 @@ export const RequestHistoriesScreen = () => {
             refreshing={isRefetchingByUser}
             onRefresh={refetchByUser}
           />
-        }>
+        }
+      >
         <View>
           {allRequestsFormated?.length > 0 ? (
             <FlatList
               data={allRequestsFormated}
-              renderItem={({item}) => (
+              renderItem={({ item }) => (
                 <>
                   <TextVariant
                     variant={'title4'}
@@ -81,7 +82,7 @@ export const RequestHistoriesScreen = () => {
                   <FlatList
                     data={item?.data}
                     scrollEnabled={false}
-                    renderItem={({item}) => (
+                    renderItem={({ item }) => (
                       <WellItemCard
                         item={item}
                         onPress={() => handleDetails(item)}
@@ -93,12 +94,12 @@ export const RequestHistoriesScreen = () => {
                   />
                 </>
               )}
-              keyExtractor={item => item?.date}
+              keyExtractor={(item) => item?.date}
               scrollEnabled={false}
               refreshing={refetch}
             />
           ) : (
-            <View style={{alignItems: 'center', marginTop: hp('10')}}>
+            <View style={{ alignItems: 'center', marginTop: hp('10') }}>
               <TextVariant
                 variant={'title3'}
                 textAlign={'center'}
@@ -126,6 +127,7 @@ const styles = StyleSheet.create({
     height: hp('100'),
     backgroundColor: THEME.colors.darkLight2,
     paddingHorizontal: country,
+    paddingBottom: hp('10'),
   },
   header: {
     height: hp('10'),

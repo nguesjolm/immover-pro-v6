@@ -1,17 +1,17 @@
 import React from 'react';
-import {View, StyleSheet} from 'react-native';
-import {AppHeader} from '../../../../components/headers/AppHeader';
-import {THEME} from '../../../../styles/theme';
-import {hp, wp} from '../../../../assets/utils/helperResponsive';
-import {country, planet} from '../../../../styles/main.style';
-import {InputCustom} from '../../../../components/atoms/InputCustom';
-import {KeyboardAwareScrollView} from 'react-native-keyboard-aware-scroll-view';
-import {ButtonGeneral} from '../../../../components/atoms/ButtonGeneral';
-import {useNavigation} from '@react-navigation/native';
-import {useOfferer} from '../../../../hooks/useOfferer';
-import {useQueryClient} from 'react-query';
-import {updateOfferer} from '../../../../assets/api/auth.api';
-import {useDispatch} from 'react-redux';
+import { View, StyleSheet, Pressable } from 'react-native';
+import { AppHeader } from '../../../../components/headers/AppHeader';
+import { THEME } from '../../../../styles/theme';
+import { hp, wp } from '../../../../assets/utils/helperResponsive';
+import { country, planet } from '../../../../styles/main.style';
+import { InputCustom } from '../../../../components/atoms/InputCustom';
+import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view';
+import { ButtonGeneral } from '../../../../components/atoms/ButtonGeneral';
+import { useNavigation } from '@react-navigation/native';
+import { useOfferer } from '../../../../hooks/useOfferer';
+import { useQueryClient } from 'react-query';
+import { updateOfferer } from '../../../../assets/api/auth.api';
+import { useDispatch } from 'react-redux';
 import {
   setErrorModalAction,
   setErrorTextAction,
@@ -22,7 +22,7 @@ export default function UpdateUserScreen() {
   const dispatch = useDispatch();
   const queryClient = useQueryClient();
   const navigation = useNavigation();
-  const {data} = useOfferer();
+  const { data } = useOfferer();
   const [isLoading, setIsLoading] = React.useState(false);
   const [form, setForm] = React.useState({
     ...data?.user,
@@ -49,8 +49,8 @@ export default function UpdateUserScreen() {
       dispatch(setErrorModalAction(true));
       dispatch(
         setErrorTextAction(
-          res?.data?.message || 'Erreur lors de la mise à jour',
-        ),
+          res?.data?.message || 'Erreur lors de la mise à jour'
+        )
       );
     }
   };
@@ -59,14 +59,15 @@ export default function UpdateUserScreen() {
     <>
       <KeyboardAwareScrollView
         style={styles.container}
-        showsVerticalScrollIndicator={false}>
+        showsVerticalScrollIndicator={false}
+      >
         <AppHeader
           title={'MON COMPTE'}
           titleColor={THEME.colors.black}
           withLeftBtn={true}
           onLeftPress={() => navigation.goBack()}
           onRigthPress={() =>
-            navigation.navigate('OnlineStack', {screen: 'UpdateUser'})
+            navigation.navigate('OnlineStack', { screen: 'UpdateUser' })
           }
         />
 
@@ -79,7 +80,7 @@ export default function UpdateUserScreen() {
               label={'Nom'}
               placeholder={'Nom'}
               value={form.name}
-              onChangeText={text => setForm({...form, name: text})}
+              onChangeText={(text) => setForm({ ...form, name: text })}
             />
             <InputCustom
               variant={'label'}
@@ -88,7 +89,7 @@ export default function UpdateUserScreen() {
               label={'Numéro de téléphone'}
               placeholder={'Numéro de téléphone'}
               value={form.tel}
-              onChangeText={text => setForm({...form, tel: text})}
+              onChangeText={(text) => setForm({ ...form, tel: text })}
             />
             <InputCustom
               variant={'label'}
@@ -97,7 +98,7 @@ export default function UpdateUserScreen() {
               label={'E-mail'}
               placeholder={'E-mail'}
               value={form.email}
-              onChangeText={text => setForm({...form, email: text})}
+              onChangeText={(text) => setForm({ ...form, email: text })}
             />
             <InputCustom
               variant={'label'}
@@ -106,7 +107,7 @@ export default function UpdateUserScreen() {
               label={'Localisation'}
               placeholder={'Localisation'}
               value={form.zone}
-              onChangeText={text => setForm({...form, zone: text})}
+              onChangeText={(text) => setForm({ ...form, zone: text })}
             />
             <InputCustom
               disabled

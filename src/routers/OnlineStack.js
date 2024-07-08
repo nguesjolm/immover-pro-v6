@@ -1,18 +1,18 @@
 import React from 'react';
-import {createNativeStackNavigator} from '@react-navigation/native-stack';
+import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 // SCREENS
-import {DrawerNavigator} from './DrawerNavigator';
-import {AddPreference} from '../views/screens/PreferencesScreen/AddPreference';
-import {PreferenceDetailScreen} from '../views/screens/PreferencesScreen/PreferenceDetailScreen';
-import {AddWellScreen} from '../views/stacks/WellStack/AddWellScreen';
-import {WellDetailsScreen} from '../views/stacks/WellStack/WellDetailsScreen';
-import {NewAppointmentsScreen} from '../views/stacks/DashboardStack/NewAppointmentsScreen';
-import {RequestDetailsScreen} from '../views/stacks/RequestStack/RequestDetailsScreen';
-import {WellProposerScreen} from '../views/stacks/WellStack/WellProposerScreen';
-import {WellOnProposedScreen} from '../views/stacks/WellStack/WellOnProposedScreen';
+import { DrawerNavigator } from './DrawerNavigator';
+import { AddPreference } from '../views/screens/PreferencesScreen/AddPreference';
+import { PreferenceDetailScreen } from '../views/screens/PreferencesScreen/PreferenceDetailScreen';
+import { AddWellScreen } from '../views/stacks/WellStack/AddWellScreen';
+import { WellDetailsScreen } from '../views/stacks/WellStack/WellDetailsScreen';
+import { NewAppointmentsScreen } from '../views/stacks/DashboardStack/NewAppointmentsScreen';
+import { RequestDetailsScreen } from '../views/stacks/RequestStack/RequestDetailsScreen';
+import { WellProposerScreen } from '../views/stacks/WellStack/WellProposerScreen';
+import { WellOnProposedScreen } from '../views/stacks/WellStack/WellOnProposedScreen';
 
-const {Navigator, Screen} = createNativeStackNavigator();
+const { Navigator, Screen } = createNativeStackNavigator();
 
 export const OnlineStack = () => {
   //
@@ -24,12 +24,12 @@ export const OnlineStack = () => {
     <Navigator>
       <Screen name={'Home'} component={DrawerNavigator} options={options} />
       <Screen
-        name="AddPreference"
+        name='AddPreference'
         component={AddPreference}
         options={options}
       />
       <Screen
-        name="PreferenceDetail"
+        name='PreferenceDetail'
         component={PreferenceDetailScreen}
         options={options}
       />

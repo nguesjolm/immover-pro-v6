@@ -1,16 +1,39 @@
-import { StyleSheet, TouchableOpacity, View } from "react-native";
-import { TextVariant } from "./TextVariant";
-import { hp } from "../../assets/utils/helperResponsive";
-import { THEME } from "../../styles/theme";
-import { city, street } from "../../styles/main.style";
-import * as ImagePicker from "expo-image-picker";
+import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { TextVariant } from './TextVariant';
+import { hp } from '../../assets/utils/helperResponsive';
+import { THEME } from '../../styles/theme';
+import { city, country, street } from '../../styles/main.style';
+import * as ImagePicker from 'expo-image-picker';
+import { ButtonCustom } from './ButtonCustom';
 // import ImagePicker from 'react-native-image-crop-picker';
 
 export const FileInput = ({ withCam, style, setFile }) => {
   //
   const [permission, requestPermission] = ImagePicker.useCameraPermissions();
 
-  const selectImageFromGallery = () => {
+  const selectImageFromGallery = async () => {
+    try {
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ImagePicker.MediaTypeOptions.Images,
+        quality: 0.7,
+        aspect: [4, 3],
+        base64: true,
+        allowsMultipleSelection: true,
+        multiple: true,
+      });
+
+      if (!result.canceled) {
+        const image = {
+          filename: result.uri.split('/').pop(),
+          path: result.uri,
+          data: result.base64,
+          mine: 'image/jpg',
+        };
+        setFile(image);
+      }
+    } catch (error) {
+      console.error('Error picking an image: ', error);
+    }
     // ImagePicker.openPicker({
     //   multiple: false,
     //   waitAnimationEnd: false,
@@ -37,9 +60,8 @@ export const FileInput = ({ withCam, style, setFile }) => {
   // camera
   const selectImageFromCamera = async () => {
     try {
-      let result = await ImagePicker.launchCameraAsync({
+      const result = await ImagePicker.launchCameraAsync({
         mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
         quality: 0.7,
         aspect: [4, 3],
         base64: true,
@@ -47,38 +69,37 @@ export const FileInput = ({ withCam, style, setFile }) => {
 
       if (!result.canceled) {
         const image = {
-          filename: result.uri.split("/").pop(),
-          path: result.uri,
+          filename: result.assets[0].uri.split('/').pop(),
+          path: result.assets[0].uri,
           data: result.base64,
-          mine: result.type,
+          mine: 'image/jpg',
         };
         setFile(image);
       }
     } catch (error) {
-      console.log("error", error);
+      console.log('error', error);
     }
-
-    // ImagePicker.openCamera({
-    //   width: 300,
-    //   height: 400,
-    //   cropping: true,
-    //   compressImageQuality: 0.5,
-    //   includeBase64: true,
-    //   width: 500,
-    //   height: 500,
-    //   compressImageMaxWidth: 500,
-    //   compressImageMaxHeight: 500,
-    // }).then(response => {
-    //   const image = {
-    //     filename: response.filename,
-    //     path: response.path,
-    //     data: 'data:image/jpeg;base64,' + response.data,
-    //     mine: response.mime,
-    //   };
-
-    //   setFile(image);
-    // });
   };
+
+  if (permission?.status !== ImagePicker.PermissionStatus.GRANTED) {
+    return (
+      <View style={styles.emptyContainer}>
+        <TextVariant
+          text={'Permission requise'}
+          variant={'title5'}
+          marginBottom={country}
+        />
+        <ButtonCustom
+          label={"Autoriser l'accès à la caméra"}
+          labelVariant={'title5'}
+          labelColor={THEME.colors.primary}
+          onPress={requestPermission}
+          btnStyle={styles.btnStyle}
+          labelTransform={'uppercase'}
+        />
+      </View>
+    );
+  }
 
   return (
     <View>
@@ -87,7 +108,7 @@ export const FileInput = ({ withCam, style, setFile }) => {
           onPress={selectImageFromGallery}
           style={styles.btnSection}
         >
-          <TextVariant text={"Choisir un fichier"} marginLeft={street} />
+          <TextVariant text={'Choisir un fichier'} marginLeft={street} />
         </TouchableOpacity>
       </View>
       {withCam && (
@@ -96,7 +117,7 @@ export const FileInput = ({ withCam, style, setFile }) => {
           style={styles.btnCamera}
         >
           <TextVariant
-            text={"Prendre une photo"}
+            text={'Prendre une photo'}
             color={THEME.colors.white}
             marginLeft={street}
           />
@@ -108,33 +129,39 @@ export const FileInput = ({ withCam, style, setFile }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flexDirection: "row",
-    alignItems: "center",
-    marginVertical: hp("1%"),
-    borderWidth: hp("0.15%"),
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginVertical: hp('1%'),
+    borderWidth: hp('0.15%'),
     borderColor: THEME.colors.darkLight,
     paddingHorizontal: street,
     borderRadius: city,
-    height: hp("7%"),
+    height: hp('7%'),
+  },
+  emptyContainer: {
+    flexDirection: 'column',
+    justifyContent: 'center',
+    alignItems: 'center',
+    height: hp('15%'),
   },
   input: {
-    width: "50%",
+    width: '50%',
   },
   separator: {
-    width: hp("0.15%"),
-    height: "100%",
+    width: hp('0.15%'),
+    height: '100%',
     backgroundColor: THEME.colors.darkLight,
   },
   btnCamera: {
-    width: "100%",
-    justifyContent: "center",
-    alignItems: "flex-start",
+    width: '100%',
+    justifyContent: 'center',
+    alignItems: 'flex-start',
     backgroundColor: THEME.colors.black,
     borderRadius: city,
-    height: hp("7%"),
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "center",
-    marginBottom: hp("1%"),
+    height: hp('7%'),
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: hp('1%'),
   },
 });

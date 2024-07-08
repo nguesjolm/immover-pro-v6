@@ -1,21 +1,27 @@
 import React from 'react';
-import {useNavigation} from '@react-navigation/native';
-import {View, StyleSheet} from 'react-native';
-import {AppHeader} from '../../../../components/headers/AppHeader';
-import {THEME} from '../../../../styles/theme';
-import {wp} from '../../../../assets/utils/helperResponsive';
-import {TextVariant} from '../../../../components/atoms/TextVariant';
-import {country, univers} from '../../../../styles/main.style';
-import {useOfferer} from '../../../../hooks/useOfferer';
-import {LogoLoader} from '../../../../components/atoms/LogoLoader';
-
+import { useNavigation } from '@react-navigation/native';
+import { View, StyleSheet, Pressable } from 'react-native';
+import { AppHeader } from '../../../../components/headers/AppHeader';
+import { THEME } from '../../../../styles/theme';
+import { wp } from '../../../../assets/utils/helperResponsive';
+import { TextVariant } from '../../../../components/atoms/TextVariant';
+import { country, univers } from '../../../../styles/main.style';
+import { useOfferer } from '../../../../hooks/useOfferer';
+import { LogoLoader } from '../../../../components/atoms/LogoLoader';
+import { setDeleteAccountModalAction } from '../../../../redux/modals';
+import { useDispatch } from 'react-redux';
 export default function UserDetailsScreen() {
   //
-  const {data, isLoading} = useOfferer();
+  const dispatch = useDispatch();
+  const { data, isLoading } = useOfferer();
   const navigation = useNavigation();
 
   const handleRedirect = () => {
-    navigation.navigate('Account', {screen: 'UpdateUser'});
+    navigation.navigate('Account', { screen: 'UpdateUser' });
+  };
+
+  const handleDeleteAccount = () => {
+    dispatch(setDeleteAccountModalAction(true));
   };
 
   const renderItem = (label, value, separator = true) => (
@@ -47,6 +53,15 @@ export default function UserDetailsScreen() {
         {renderItem('Identité', data?.offreur?.identite || 'Néant')}
         {renderItem('Profil', data?.offreur?.profil || 'Néant', false)}
       </View>
+      <Pressable onPress={handleDeleteAccount}>
+        <TextVariant
+          text={'Supprimer mon compte'}
+          textDecorationLine={'underline'}
+          variant={'title3'}
+          marginTop={23}
+          color={THEME.colors.primary}
+        />
+      </Pressable>
     </View>
   );
 }

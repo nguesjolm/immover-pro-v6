@@ -1,4 +1,4 @@
-import {createSlice} from '@reduxjs/toolkit';
+import { createSlice } from '@reduxjs/toolkit';
 
 const initialState = {
   commitmentModal: false,
@@ -13,6 +13,7 @@ const initialState = {
   proprosedOfferedModal: false,
   validatedProprosedModal: false,
   notifPreviewModal: false,
+  deleteAccountModal: false,
 };
 
 export const modalState = createSlice({
@@ -55,6 +56,9 @@ export const modalState = createSlice({
     setNotifPreviewModalAction: (state, action) => {
       state.notifPreviewModal = action.payload;
     },
+    setDeleteAccountModalAction: (state, action) => {
+      state.deleteAccountModal = action.payload;
+    },
   },
 });
 
@@ -71,6 +75,7 @@ export const {
   setProposedOfferedModalAction,
   setValidatedProposedModalAction,
   setNotifPreviewModalAction,
+  setDeleteAccountModalAction,
 } = modalState.actions;
 
 export default modalState.reducer;

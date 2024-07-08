@@ -1,11 +1,11 @@
-import {ImageBackground, StyleSheet, View} from 'react-native';
-import {THEME} from '../../styles/theme';
-import {ButtonGeneral} from '../atoms/ButtonGeneral';
-import {TextVariant} from '../atoms/TextVariant';
-import {hp, wp} from '../../assets/utils/helperResponsive';
-import {useNavigation} from '@react-navigation/native';
+import { ImageBackground, StyleSheet, View } from 'react-native';
+import { THEME } from '../../styles/theme';
+import { ButtonGeneral } from '../atoms/ButtonGeneral';
+import { TextVariant } from '../atoms/TextVariant';
+import { hp, wp } from '../../assets/utils/helperResponsive';
+import { useNavigation } from '@react-navigation/native';
 
-export const BannerContent = ({totalTransaction}) => {
+export const BannerContent = ({ totalTransaction }) => {
   //
   const navigation = useNavigation();
 
@@ -33,7 +33,7 @@ export const BannerContent = ({totalTransaction}) => {
           btnStyle={styles.historyBtn}
           variant={'smallText'}
           onPress={() =>
-            navigation.navigate('Home', {screen: 'TransactionBalance'})
+            navigation.navigate('Home', { screen: 'TransactionBalance' })
           }
         />
       </View>
@@ -51,6 +51,7 @@ const styles = StyleSheet.create({
   bannerText: {
     width: wp('100'),
     marginTop: hp('-9'),
+    paddingTop: hp('3'),
   },
   bannerImage: {
     width: '100%',

@@ -1,9 +1,9 @@
 import axios from 'axios';
-import {BASE_URI} from './app.config';
-import {helperHeaderConfig} from '../utils/helperHeader';
+import { BASE_URI } from './app.config';
+import { helperHeaderConfig } from '../utils/helperHeader';
 
 // REGISTER USER
-export const registerOfferor = async data => {
+export const registerOfferor = async (data) => {
   // const headers = await helperHeaderConfig(true);
 
   try {
@@ -24,7 +24,7 @@ export const registerOfferor = async data => {
 };
 
 // LOGIN USER
-export const loginOfferor = async data => {
+export const loginOfferor = async (data) => {
   try {
     const response = await axios.post(`${BASE_URI}/loginOffreur`, data, {
       headers: {
@@ -42,53 +42,53 @@ export const loginOfferor = async data => {
 export const fetchOfferer = async () => {
   const headers = await helperHeaderConfig();
   const response = await axios
-    .get(`${BASE_URI}/getOffreurCount`, {headers})
-    .catch(error => error.response);
+    .get(`${BASE_URI}/getOffreurCount`, { headers })
+    .catch((error) => error.response);
 
   return response;
 };
 
 // UPDATE OFFEROR
-export const updateOfferer = async data => {
+export const updateOfferer = async (data) => {
   const headers = await helperHeaderConfig();
   const response = await axios
     .post(`${BASE_URI}/updateOffreurCount`, data, {
       headers,
     })
-    .catch(error => error.response);
+    .catch((error) => error.response);
 
   return response;
 };
 
 // GENERATE CODE
-export const generateOTPCode = async data => {
+export const generateOTPCode = async (data) => {
   const headers = await helperHeaderConfig();
   const response = await axios
     .post(`${BASE_URI}/generateotpOffreur`, data, {
       headers,
     })
-    .catch(error => error.response);
+    .catch((error) => error.response);
 
   return response;
 };
 
 // VERIFY CODE
-export const verifyOTPCode = async data => {
+export const verifyOTPCode = async (data) => {
   const headers = await helperHeaderConfig();
   const response = await axios
-    .post(`${BASE_URI}/chekotpOffreur`, data, {headers})
-    .catch(error => error.response);
+    .post(`${BASE_URI}/chekotpOffreur`, data, { headers })
+    .catch((error) => error.response);
 
   return response;
 };
 
 // UPDATE PASSWORD
 
-export const updatePassword = async data => {
+export const updatePassword = async (data) => {
   const headers = await helperHeaderConfig();
   const response = await axios
-    .post(`${BASE_URI}/changepasswordPro`, data, {headers})
-    .catch(error => error.response);
+    .post(`${BASE_URI}/changepasswordPro`, data, { headers })
+    .catch((error) => error.response);
 
   return response;
 };
@@ -105,9 +105,19 @@ export const userConnectState = async (token: any) => {
           Authorization: `Bearer ${token}`,
           'Content-Type': 'application/json',
         },
-      },
+      }
     )
-    .catch(error => error.response);
+    .catch((error) => error.response);
+
+  return response;
+};
+
+// DELETE USER
+export const deleteClient = async (id: any) => {
+  const headers = await helperHeaderConfig();
+  const response = await axios
+    .get(`${BASE_URI}/deleteclientcompte/${id}`, { headers })
+    .catch((error) => error.response);
 
   return response;
 };
