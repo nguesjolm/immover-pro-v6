@@ -1,4 +1,4 @@
-import {useQuery} from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import {
   fetchWellById,
   fetchWellCategories,
@@ -9,41 +9,43 @@ import {
   fetchWellTypes,
   fetchWells,
 } from '../assets/api/fetchWells';
-import {useSelector} from 'react-redux';
+import { useSelector } from 'react-redux';
 import React from 'react';
 
 // Fetch Wells
 export const useWells = () => {
-  const {data, isLoading, error, refetch} = useQuery('wells', () =>
-    fetchWells(),
-  );
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['wells'],
+    queryFn: () => fetchWells(),
+  });
 
-  return {data: data?.data || [], isLoading, error, refetch};
+  return { data: data?.data || [], isLoading, error, refetch };
 };
 
 // Fetch Well by id
 export const useWell = (id: number | string | null) => {
-  const {data, isLoading, error, refetch} = useQuery(
-    ['well', id],
-    () => fetchWellById(id),
-    {enabled: !!id},
-  );
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['well', id],
+    queryFn: () => fetchWellById(id),
+    enabled: !!id,
+  });
 
-  return {data: data?.data || [], isLoading, error, refetch};
+  return { data: data?.data || [], isLoading, error, refetch };
 };
 
 // Fetch Well categories
 export const useWellCategories = () => {
-  const {data, isLoading, error, refetch} = useQuery('wellCategories', () =>
-    fetchWellCategories(),
-  );
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['wellCategories'],
+    queryFn: () => fetchWellCategories(),
+  });
 
-  return {data: data?.data || [], isLoading, error, refetch};
+  return { data: data?.data || [], isLoading, error, refetch };
 };
 
 // Filter by
 export const useFilterWells = (data: any) => {
-  const {categoriesSelected, statusSelected} = useSelector(s => s.wellState);
+  const { categoriesSelected, statusSelected } = useSelector((s: any) => s.wellState);
 
   const wellsFiltered = React.useMemo(() => {
     if (data?.biens?.length > 0) {
@@ -67,50 +69,53 @@ export const useFilterWells = (data: any) => {
     return [];
   }, [data, statusSelected, categoriesSelected]);
 
-  return {wellsFiltered, categoriesSelected, statusSelected};
+  return { wellsFiltered, categoriesSelected, statusSelected };
 };
 
 // Fetch Well proposals by request id
 export const useWellProposals = (id: number | string | null) => {
-  const {data, isLoading, error, refetch} = useQuery(
-    'wellProposals',
-    () => fetchWellProposals(id),
-    {enabled: !!id},
-  );
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['wellProposals', id],
+    queryFn: () => fetchWellProposals(id),
+    enabled: !!id,
+  });
 
-  return {data: data?.data || [], isLoading, error, refetch};
+  return { data: data?.data || [], isLoading, error, refetch };
 };
 
 // Fetch Well operations
 export const useOperations = () => {
-  const {data, isLoading, error, refetch} = useQuery('operations', () =>
-    fetchWellOperations(),
-  );
-  return {data: data?.data || [], isLoading, error, refetch};
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['operations'],
+    queryFn: () => fetchWellOperations(),
+  });
+  return { data: data?.data || [], isLoading, error, refetch };
 };
 
-// Fetch Well operations
+// Fetch Well types - CORRECTION: Changement de la queryKey
 export const useWellTypes = () => {
-  const {data, isLoading, error, refetch} = useQuery('operations', () =>
-    fetchWellTypes(),
-  );
-  return {data: data?.data || [], isLoading, error, refetch};
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['wellTypes'], // Changé de 'operations' à 'wellTypes'
+    queryFn: () => fetchWellTypes(),
+  });
+  return { data: data?.data || [], isLoading, error, refetch };
 };
 
 // Fetch Well cities
 export const useWellCities = () => {
-  const {data, isLoading, error, refetch} = useQuery('cities', () =>
-    fetchWellCities(),
-  );
-  return {data: data?.data || [], isLoading, error, refetch};
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['cities'],
+    queryFn: () => fetchWellCities(),
+  });
+  return { data: data?.data || [], isLoading, error, refetch };
 };
 
 // Fetch Well states by city id
 export const useWellStates = (id: number | string | null) => {
-  const {data, isLoading, error, refetch} = useQuery(
-    'states',
-    () => fetchWellStates(id),
-    {enabled: !!id},
-  );
-  return {data: data?.data || [], isLoading, error, refetch};
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['states', id],
+    queryFn: () => fetchWellStates(id),
+    enabled: !!id,
+  });
+  return { data: data?.data || [], isLoading, error, refetch };
 };

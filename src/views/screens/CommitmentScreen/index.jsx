@@ -28,7 +28,51 @@ export const CommitmentScreen = () => {
   const zone = useSelector(s => s.registerState.zone);
   const password = useSelector(s => s.registerState.password);
 
-  const base64Image = file.data;
+
+  // ✅ Correction : Fonction pour extraire correctement le base64
+  const getBase64Image = () => {
+    // Si file est un tableau avec au moins un élément
+    if (Array.isArray(file) && file.length > 0) {
+      const firstFile = file[0];
+      
+      // Si l'objet a une propriété formattedBase64 (nouvelle approche)
+      if (firstFile.formattedBase64) {
+        return firstFile.formattedBase64;
+      }
+      
+      // Si l'objet a une propriété base64
+      if (firstFile.base64) {
+        return `data:${firstFile.mimeType || 'image/jpeg'};base64,${firstFile.base64}`;
+      }
+      
+      // Si c'est déjà une chaîne base64
+      if (typeof firstFile === 'string') {
+        return firstFile;
+      }
+    }
+    
+    // Si file est un objet unique
+    if (file && typeof file === 'object') {
+      if (file.formattedBase64) return file.formattedBase64;
+      if (file.base64) return `data:${file.mimeType || 'image/jpeg'};base64,${file.base64}`;
+    }
+    
+    // Si file est directement une chaîne
+    if (typeof file === 'string') {
+      return file;
+    }
+    
+    return null;
+  };
+
+  // const base64Image = file.data;
+  const base64Image = getBase64Image();
+
+  // ✅ Log pour debug
+  console.log('Structure de file:', JSON.stringify(file, null, 2));
+  console.log('Base64 extrait longueur:', base64Image?.length);
+  console.log('Base64 extrait début:', base64Image?.substring(0, 100));
+  
 
   const handleModal = () => {
     navigation.goBack();
@@ -57,7 +101,13 @@ export const CommitmentScreen = () => {
       password,
       cni: base64Image,
     };
+    // console.log('file : '+file.data);
 
+    console.log('Payload envoyé:', {
+      ...payload,
+      cni: payload.cni ? `${payload.cni.substring(0, 100)}...` : null
+    });
+    
     const result = await registerOfferor(payload);
 
     if (result.status === 200) {
@@ -67,10 +117,12 @@ export const CommitmentScreen = () => {
     } else {
       setLoading(false);
       const message = result?.data?.message || result?.data;
+      console.log('data file : '+result?.data?.message);
       dispatch(setErrorModalAction(true));
       dispatch(setErrorTextAction(message || 'Une erreur est survenue'));
       handleModal();
     }
+      
   };
 
   return (

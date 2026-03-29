@@ -45,9 +45,15 @@
         "expo-build-properties",
         {
           "android": {
-            "usesCleartextTraffic": true
+            "compileSdkVersion": 35,
+            "targetSdkVersion": 35,
+            "buildToolsVersion": "35.0.0",
+            "usesCleartextTraffic": true,
+            "kotlinVersion": "2.0.21",
+            "kotlinGradlePluginVersion": "2.0.21"
           },
           "ios": {
+            "deploymentTarget": "15.1",
             "NSCameraUsageDescription": "Autoriser l'application à accéder à votre camera pour prendre des photos de votre profil et de vos biens immobiliers",
             "NSPhotoLibraryUsageDescription": "Autoriser l'application à accéder à votre camera pour prendre des photos de votre profil et de vos biens immobiliers"
           }
@@ -66,7 +72,10 @@
       "policy": "appVersion"
     },
     "updates": {
-      "url": "https://u.expo.dev/63b56d02-a7df-48e2-ab57-8470df9baaeb"
+      "url": "https://u.expo.dev/9b025515-8eb5-4f06-9f59-e52804014371"
+    },
+    "experiments": {
+      "typedRoutes": true
     }
   }
 }

@@ -29,9 +29,12 @@ export const BottomTabNavigator = () => {
           backgroundColor: THEME.colors.white,
           borderTopColor: THEME.colors.darkLight,
           borderTopWidth: 1,
-          height: hp(9),
+          /*height: hp(9),
           position: 'absolute',
+          paddingTop: hp(1),*/
+          height: hp(9), // Valeur fixe pour tester
           paddingTop: hp(1),
+          paddingBottom: 10,
           ...shadowTop,
         },
         tabBarLabelPosition: 'below-icon',

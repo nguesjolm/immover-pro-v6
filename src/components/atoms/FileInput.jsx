@@ -1,13 +1,12 @@
-import { StyleSheet, TouchableOpacity, View } from 'react-native';
+import { StyleSheet, TouchableOpacity, View, ScrollView, Image } from 'react-native';
 import { TextVariant } from './TextVariant';
 import { hp } from '../../assets/utils/helperResponsive';
 import { THEME } from '../../styles/theme';
 import { city, country, street } from '../../styles/main.style';
 import * as ImagePicker from 'expo-image-picker';
 import { ButtonCustom } from './ButtonCustom';
-// import ImagePicker from 'react-native-image-crop-picker';
 
-export const FileInput = ({ withCam, style, setFile }) => {
+export const FileInput = ({ withCam, style, setFile, files = [] }) => {
   //
   const [permission, requestPermission] = ImagePicker.useCameraPermissions();
 
@@ -18,46 +17,31 @@ export const FileInput = ({ withCam, style, setFile }) => {
         quality: 0.7,
         aspect: [4, 3],
         base64: true,
-        allowsMultipleSelection: true,
-        multiple: true,
+        allowsMultipleSelection: true, // ✅ Permet la sélection multiple
+        selectionLimit: 10, // Limite à 10 images (optionnel)
       });
 
-      if (!result.canceled) {
-        const image = {
-          filename: result.uri.split('/').pop(),
-          path: result.uri,
-          data: result.base64,
-          mine: 'image/jpg',
-        };
-        setFile(image);
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        // Transformer chaque asset en objet image
+        const images = result.assets.map(asset => ({
+          uri: asset.uri,
+          name: asset.uri.split('/').pop() || 'image.jpg',
+          type: 'image/jpeg',
+          base64: asset.base64,
+          width: asset.width,
+          height: asset.height,
+          fileName: asset.fileName,
+          mimeType: asset.mimeType,
+        }));
+        
+        setFile(images); // ✅ Envoyer un tableau d'images
       }
     } catch (error) {
       console.error('Error picking an image: ', error);
     }
-    // ImagePicker.openPicker({
-    //   multiple: false,
-    //   waitAnimationEnd: false,
-    //   includeExif: true,
-    //   compressImageQuality: 0.5,
-    //   mediaType: 'photo',
-    //   maxFiles: 1,
-    //   includeBase64: true,
-    //   width: 500,
-    //   height: 500,
-    //   compressImageMaxWidth: 500,
-    //   compressImageMaxHeight: 500,
-    // }).then(response => {
-    //   const image = {
-    //     filename: response.filename,
-    //     path: response.path,
-    //     data: 'data:image/jpeg;base64,' + response.data,
-    //     mine: response.mime,
-    //   };
-    //   setFile(image);
-    // });
   };
 
-  // camera
+  // camera (toujours une seule image)
   const selectImageFromCamera = async () => {
     try {
       const result = await ImagePicker.launchCameraAsync({
@@ -67,21 +51,30 @@ export const FileInput = ({ withCam, style, setFile }) => {
         base64: true,
       });
 
-      if (!result.canceled) {
+      if (!result.canceled && result.assets && result.assets.length > 0) {
+        const asset = result.assets[0];
         const image = {
-          filename: result.assets[0].uri.split('/').pop(),
-          path: result.assets[0].uri,
-          data: result.base64,
-          mine: 'image/jpg',
+          uri: asset.uri,
+          name: asset.uri.split('/').pop() || 'camera_image.jpg',
+          type: 'image/jpeg',
+          base64: asset.base64,
+          width: asset.width,
+          height: asset.height,
         };
-        setFile(image);
+        setFile([image]); // ✅ Envoyer un tableau avec une seule image
       }
     } catch (error) {
       console.log('error', error);
     }
   };
 
-  if (permission?.status !== ImagePicker.PermissionStatus.GRANTED) {
+  // Fonction pour supprimer une image
+  const removeImage = (indexToRemove) => {
+    const newFiles = files.filter((_, index) => index !== indexToRemove);
+    setFile(newFiles);
+  };
+
+  if (permission?.status !== ImagePicker.PermissionStatus.GRANTED && withCam) {
     return (
       <View style={styles.emptyContainer}>
         <TextVariant
@@ -108,9 +101,20 @@ export const FileInput = ({ withCam, style, setFile }) => {
           onPress={selectImageFromGallery}
           style={styles.btnSection}
         >
-          <TextVariant text={'Choisir un fichier'} marginLeft={street} />
+          <TextVariant 
+            text={files.length > 0 ? 'Ajouter d\'autres fichiers' : 'Choisir un fichier'} 
+            marginLeft={street} 
+          />
+          {files.length > 0 && (
+            <TextVariant 
+              text={`(${files.length} sélectionné${files.length > 1 ? 's' : ''})`}
+              color={THEME.colors.primary}
+              marginLeft={street}
+            />
+          )}
         </TouchableOpacity>
       </View>
+      
       {withCam && (
         <TouchableOpacity
           onPress={selectImageFromCamera}
@@ -122,6 +126,23 @@ export const FileInput = ({ withCam, style, setFile }) => {
             marginLeft={street}
           />
         </TouchableOpacity>
+      )}
+
+      {/* Aperçu des images sélectionnées */}
+      {files.length > 0 && (
+        <ScrollView horizontal showsHorizontalScrollIndicator={false} style={styles.previewContainer}>
+          {files.map((file, index) => (
+            <View key={index} style={styles.previewItem}>
+              <Image source={{ uri: file.uri }} style={styles.previewImage} />
+              <TouchableOpacity 
+                style={styles.removeButton}
+                onPress={() => removeImage(index)}
+              >
+                <TextVariant text="×" color={THEME.colors.white} variant="title3" />
+              </TouchableOpacity>
+            </View>
+          ))}
+        </ScrollView>
       )}
     </View>
   );
@@ -144,14 +165,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     height: hp('15%'),
   },
-  input: {
-    width: '50%',
-  },
-  separator: {
-    width: hp('0.15%'),
-    height: '100%',
-    backgroundColor: THEME.colors.darkLight,
-  },
   btnCamera: {
     width: '100%',
     justifyContent: 'center',
@@ -163,5 +176,30 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginBottom: hp('1%'),
+  },
+  previewContainer: {
+    flexDirection: 'row',
+    marginTop: hp('2%'),
+    maxHeight: hp('12%'),
+  },
+  previewItem: {
+    position: 'relative',
+    marginRight: street,
+  },
+  previewImage: {
+    width: hp('10%'),
+    height: hp('10%'),
+    borderRadius: city,
+  },
+  removeButton: {
+    position: 'absolute',
+    top: -5,
+    right: -5,
+    backgroundColor: THEME.colors.error || 'red',
+    width: hp('3%'),
+    height: hp('3%'),
+    borderRadius: hp('1.5%'),
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 });

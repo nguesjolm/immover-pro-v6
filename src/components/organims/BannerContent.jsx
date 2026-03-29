@@ -27,7 +27,7 @@ export const BannerContent = ({ totalTransaction }) => {
           textAlign={'center'}
           color={THEME.colors.white}
         />
-        <ButtonGeneral
+        {/* <ButtonGeneral
           text={'Voir l’historique'}
           backgroundColor={THEME.colors.green}
           btnStyle={styles.historyBtn}
@@ -35,7 +35,7 @@ export const BannerContent = ({ totalTransaction }) => {
           onPress={() =>
             navigation.navigate('Home', { screen: 'TransactionBalance' })
           }
-        />
+        /> */}
       </View>
     </View>
   );

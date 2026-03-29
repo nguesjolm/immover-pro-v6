@@ -17,9 +17,12 @@ export const NewPasswordScreen = ({route}) => {
   const otpCode = useNewPassword(tel);
 
   return (
-    <KeyboardAwareScrollView style={styles?.container}>
+    <KeyboardAwareScrollView 
+      style={styles?.container}
+      contentContainerStyle={styles.contentContainer}
+    >
       <View style={styles.curveRight} />
-      <RegisterHeader title={'Nouveaux mot de passe'} />
+      <RegisterHeader title={'Nouveau mot de passe'} />
       <View style={styles.content}>
         <InputCustom
           onChangeText={() => {}}
@@ -66,12 +69,16 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: THEME.colors.white,
   },
+  contentContainer: {
+    flexGrow: 1,
+  },
   content: {
     flex: 1,
     backgroundColor: THEME.colors.white,
     borderTopLeftRadius: univers * 1.3,
     paddingHorizontal: univers,
     paddingTop: univers,
+    zIndex: 1, // Pour que le contenu soit au-dessus de l'orangé
   },
   submitBtn: {
     marginTop: planet,
@@ -85,6 +92,12 @@ const styles = StyleSheet.create({
     width: 200,
     height: '90%',
     position: 'absolute',
+    top: 0,
+    left: 0,
+    bottom: 0, // Remplacer height: '90%' par bottom: 0
     zIndex: 0,
+  },
+  title: {
+    marginBottom: city,
   },
 });

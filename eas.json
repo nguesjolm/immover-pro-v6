@@ -1,18 +1,29 @@
 {
   "cli": {
-    "version": ">= 7.6.1"
+    "version": ">= 8.0.0",
+    "appVersionSource": "remote"
   },
   "build": {
     "development": {
       "developmentClient": true,
-      "distribution": "internal"
+      "distribution": "internal",
+      "channel": "development"
     },
     "preview": {
-      "distribution": "internal"
+      "distribution": "internal",
+      "channel": "preview"
     },
-    "production": {}
+    "production": {
+      "channel": "production"
+    }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "ios":{
+        "appleId":"devdodo225@gmail.com",
+        "ascAppId":"6478608071",
+        "appleTeamId":"GM667874QZ"
+      }
+    }
   }
 }

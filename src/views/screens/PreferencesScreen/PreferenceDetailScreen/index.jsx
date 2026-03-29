@@ -10,7 +10,7 @@ import {ButtonGeneral} from '../../../../components/atoms/ButtonGeneral';
 import {usePreferencesById} from '../../../../hooks/usePreferences';
 import {LogoLoader} from '../../../../components/atoms/LogoLoader';
 import {deletePreferences} from '../../../../assets/api/fetchPreferences.api';
-import {useQueryClient} from 'react-query';
+import {useQueryClient} from '@tanstack/react-query';
 
 export const PreferenceDetailScreen = ({route}) => {
   //

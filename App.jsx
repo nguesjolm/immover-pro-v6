@@ -8,7 +8,7 @@ import { store } from './src/redux/store';
 import { AppRouter } from './src/routers';
 
 //REACT QUERY
-import { QueryClientProvider, QueryClient } from 'react-query';
+import { QueryClientProvider, QueryClient } from '@tanstack/react-query';
 import { THEME } from './src/styles/theme';
 import { SignInContextProvider } from './src/contexts/authContext';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';

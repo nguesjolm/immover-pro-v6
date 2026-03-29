@@ -1,4 +1,4 @@
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo } from "react";
 import { StyleSheet, View } from "react-native";
 import { AppHeader } from "../../../../components/headers/AppHeader";
 import { THEME } from "../../../../styles/theme";
@@ -19,8 +19,9 @@ import {
 } from "../../../../redux/modals";
 import { addWell } from "../../../../assets/api/fetchWells";
 import { resetWellAddDataAction } from "../../../../redux/wells";
-import { useQueryClient } from "react-query";
+import { useQueryClient } from "@tanstack/react-query";
 import { sendOfferProposed } from "../../../../assets/api/fetchRequests";
+import {compressVideo} from '../../../../assets/utils/videoCompressor';
 
 const SALE = "Vente";
 const LOCATION = "Location";
@@ -32,6 +33,7 @@ export const AddWellScreen = ({ route }) => {
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const queryClient = useQueryClient();
+  // const status = route?.params?.status;
   const status = route?.params?.status;
   const wellAdd = useSelector((s) => s.wellState.wellAddData);
   const requestSelect = useSelector((s) => s.requestState.requestSelected);
@@ -45,8 +47,7 @@ export const AddWellScreen = ({ route }) => {
   };
 
   const handleNext = async () => {
-    const { operations, categories_Biens, pays, villes, commune_quartiers } =
-      wellAdd;
+    const { operations, categories_Biens, pays, villes, commune_quartiers } = wellAdd;
 
     if (currentStep === 1) {
       if (
@@ -131,16 +132,17 @@ export const AddWellScreen = ({ route }) => {
       }
     }
 
+
     // SEND DATA TO API
     if (currentStep === 3) {
       if (wellAdd?.images.length <= 0) {
         dispatch(setErrorModalAction(true));
         dispatch(setErrorTextAction("Veuillez ajouter au moins une image"));
       } else {
-        // setLoading(true);
-        // dispatch(setErrorModalAction(false));
-        // dispatch(setErrorTextAction(""));
-
+        setLoading(true);
+        dispatch(setErrorModalAction(false));
+        dispatch(setErrorTextAction(""));
+        
         const payload = {
           operations: operations?.id,
           categories_Biens: categories_Biens?.id,
@@ -165,7 +167,7 @@ export const AddWellScreen = ({ route }) => {
           images_7: wellAdd?.images[6] || null,
           images_8: wellAdd?.images[7] || null,
           images_9: wellAdd?.images[8] || null,
-          video: null,
+          video: wellAdd?.video || null,
         };
 
         // console.log("====================================");
@@ -189,6 +191,7 @@ export const AddWellScreen = ({ route }) => {
         formData.append("montant_vente", payload?.montant_vente);
         formData.append("document", payload?.document);
         formData.append("superficie", payload?.superficie);
+        // formData.append("video", payload?.video);
 
         // map images
         wellAdd?.images?.map((image, index) => {
@@ -199,40 +202,98 @@ export const AddWellScreen = ({ route }) => {
           });
         });
 
+        // Pour la vidéo
+        const compressedVideo = await compressVideo(wellAdd.video.uri, { maxSizeMB: 10 });
+        if (!compressedVideo) {
+          dispatch(setErrorTextAction("La vidéo est trop volumineuse (max 10MB)"));
+          setLoading(false);
+          return;
+        }
+        // Ajouter au formData
+        formData.append('video', {
+          uri: compressedVideo.uri,
+          name: compressedVideo.name,
+          type: compressedVideo.type,
+        });
+
+
+        console.log("response_status : "+status);
+
         let response = null;
         if (status === "offered") {
           formData.append("process", "new");
           formData.append("demande_id", requestSelect?.demande_id);
           formData.append("bien_existing", false);
           response = await sendOfferProposed(formData, payload?.operations);
+          console.log("=============================");
+          if (response?.statuscode === 200) {
+            // Succès
+            console.log("Offre envoyée avec succès");
+            dispatch(setSuccessModalAction(true));
+            dispatch(
+              setSuccessTextAction(
+                response?.message
+              )
+            );
+            // navigation.navigate("Home");
+            queryClient.invalidateQueries("wells");
+            // Navigue vers la liste
+            navigation.goBack();
+          } else {
+            // Erreur
+            setLoading(false);
+            dispatch(setErrorModalAction(true));
+            console.error("Erreur:", response?.message);
+            dispatch(
+              setErrorTextAction(
+                response?.message
+              )
+            );
+          }
+          console.log("=============================");
         } else {
           response = await addWell(formData);
+          console.log("response_addBiens : "+response?.data?.message);
+          // console.log("response_addBiens : "+response);
+          console.log("===================");
         }
+       
 
-        if (response?.statuscode === 200) {
+        if (response?.data?.statuscode === 200) {
           setLoading(false);
           dispatch(resetWellAddDataAction());
           if (status !== "offered") {
             dispatch(setSuccessModalAction(true));
             dispatch(
-              setSuccessTextAction("Votre bien a été ajouté avec succès")
+              setSuccessTextAction(response?.data?.message)
             );
-            navigation.navigate("Well");
+            // navigation.navigate("Well");
             queryClient.invalidateQueries("wells");
+            // Navigue vers la liste
+            navigation.goBack();
+
           } else {
             dispatch(setSuccessModalAction(true));
             dispatch(
               setSuccessTextAction(
-                "Votre proposition a été envoyée avec succès"
+                response?.data?.message
               )
             );
-            navigation.navigate("Home");
+            // navigation.navigate("Home");
             queryClient.invalidateQueries("wells");
+            // Navigue vers la liste
+            navigation.goBack();
           }
         }
       }
     }
+
   };
+
+  useEffect(() => {
+    console.log("Route params:", route?.params);
+    console.log("Status from params:", route?.params?.status);
+  }, [route]);
 
   const addWellForm = useMemo(() => {
     switch (currentStep) {

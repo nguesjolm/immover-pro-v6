@@ -1,4 +1,4 @@
-import {useQuery} from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import {
   fetchNotifications,
   getNewNotificationsCount,
@@ -6,19 +6,30 @@ import {
 
 // Fetch Notifications
 export const useNotifications = () => {
-  const {data, isLoading, error, refetch} = useQuery(['notifications'], () =>
-    fetchNotifications(),
-  );
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['notifications'],
+    queryFn: () => fetchNotifications(),
+  });
 
-  return {data: data?.data || [], isLoading, error, refetch};
+  return { 
+    data: data?.data || [], 
+    isLoading, 
+    error, 
+    refetch 
+  };
 };
 
 // Get new notifications count
 export const useNewNotificationsCount = () => {
-  const {data, isLoading, error, refetch} = useQuery(
-    ['newNotificationsCount', 'notifications'],
-    () => getNewNotificationsCount(),
-  );
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['newNotificationsCount', 'notifications'],
+    queryFn: () => getNewNotificationsCount(),
+  });
 
-  return {data: data?.data || [], isLoading, error, refetch};
+  return { 
+    data: data?.data || [], 
+    isLoading, 
+    error, 
+    refetch 
+  };
 };

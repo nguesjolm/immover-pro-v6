@@ -1,4 +1,4 @@
-import {useQuery} from 'react-query';
+import { useQuery } from '@tanstack/react-query';
 import {
   fetchPreferences,
   fetchPreferencesById,
@@ -6,20 +6,31 @@ import {
 
 // Fetch Preferences
 export const usePreferences = () => {
-  const {data, isLoading, error, refetch} = useQuery('preferences', () =>
-    fetchPreferences(),
-  );
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['preferences'],
+    queryFn: () => fetchPreferences(),
+  });
 
-  return {data: data?.data || [], isLoading, error, refetch};
+  return { 
+    data: data?.data || [], 
+    isLoading, 
+    error, 
+    refetch 
+  };
 };
 
 // Fetch Preferences by id
 export const usePreferencesById = (id: any) => {
-  const {data, isLoading, error, refetch} = useQuery(
-    ['preferences', id],
-    () => fetchPreferencesById({id}),
-    {enabled: !!id},
-  );
+  const { data, isLoading, error, refetch } = useQuery({
+    queryKey: ['preferences', id],
+    queryFn: () => fetchPreferencesById({ id }),
+    enabled: !!id,  // La requête ne s'exécute que si id existe
+  });
 
-  return {data: data?.data || [], isLoading, error, refetch};
+  return { 
+    data: data?.data || [], 
+    isLoading, 
+    error, 
+    refetch 
+  };
 };

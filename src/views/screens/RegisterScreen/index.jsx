@@ -47,11 +47,11 @@ export const RegisterScreen = () => {
         }
         break;
       case 2:
-        if (!name || !email || !tel || !zone || !password || !cpassword) {
+        if (!name  || !tel || !zone || !password || !cpassword) {
           dispatch(setErrorModalAction(true));
           dispatch(
             setErrorTextAction(
-              `Veuillez saisissez votre nom, email, téléphone, zone, mot de passe et confirmer le mot de passe`,
+              `Veuillez saisissez votre nom, téléphone, zone, mot de passe et confirmer le mot de passe`,
             ),
           );
           return;

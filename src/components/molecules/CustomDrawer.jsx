@@ -11,35 +11,45 @@ import { ButtonGeneral } from '../atoms/ButtonGeneral';
 import { useDisconnected } from '../../hooks/useDisconnected';
 
 const CustomDrawer = (props) => {
-  //
   const { handleDisconnected } = useDisconnected();
 
   return (
-    <View style={{ flex: 1 }}>
+    <View style={styles.container}>
       <DrawerContentScrollView
         {...props}
-        contentContainerStyle={styles.topContent}
+        contentContainerStyle={styles.scrollView}
       >
-        <View style={styles.imageContent}>
-          <View style={styles.imageItem}>
+        {/* Header avec logo et titre */}
+        <View style={styles.header}>
+          <View style={styles.headerContent}>
             <TextVariant
               variant={'h3'}
               text={'IMMOVER PRO'}
               color={THEME.colors.white}
               textAlign={'center'}
-              marginTop={hp('2.8')}
+              marginTop={hp('24')}
               fontStyle={'italic'}
               letterSpacing={hp('.4')}
             />
             <Image
               source={require('../../assets/images/work.png')}
-              style={styles.image}
+              style={styles.logo}
+              resizeMode="contain"
             />
           </View>
         </View>
 
-        <View style={styles.menu}>
-          <DrawerItemList {...props} />
+        {/* Menu de navigation */}
+        <View style={styles.menuContainer}>
+          <DrawerItemList 
+            {...props} 
+            // Personnalisation supplémentaire pour éviter les fonds indésirables
+            activeBackgroundColor="transparent"
+            inactiveBackgroundColor="transparent"
+            labelStyle={styles.drawerLabel}
+          />
+          
+          {/* Bouton déconnexion */}
           <ButtonGeneral
             onPress={handleDisconnected}
             text={'Se déconnecter'}
@@ -54,39 +64,52 @@ const CustomDrawer = (props) => {
 export default CustomDrawer;
 
 const styles = StyleSheet.create({
-  topContent: {
+  container: {
+    flex: 1,
+    backgroundColor: THEME.colors.primary, // Fond principal
+  },
+  scrollView: {
     flex: 1,
     backgroundColor: THEME.colors.primary,
   },
-  imageContent: {
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    backgroundColor: THEME.colors.green,
+  header: {
+    // backgroundColor: THEME.colors.green,
+    borderBottomLeftRadius: hp(2),
+    borderBottomRightRadius: hp(2),
+    overflow: 'hidden',
   },
-  imageItem: {
+  headerContent: {
     width: wp('100'),
     height: hp('30'),
     backgroundColor: THEME.colors.primary,
-  },
-  image: {
-    width: wp('100'),
-    height: hp('30'),
-    justifyContent: 'flex-end',
+    justifyContent: 'center',
     alignItems: 'center',
-    alignSelf: 'center',
-    backgroundColor: THEME.colors.primary,
-    opacity: 0.2,
     position: 'relative',
-    bottom: hp('0'),
-    resizeMode: 'contain',
+    marginLeft:'-68'
   },
-  menu: {
+  logo: {
+    width: wp('80'),
+    height: hp('25'),
+    position: 'absolute',
+    bottom: 0,
+    opacity: 0.2,
+  },
+  menuContainer: {
     flex: 1,
-    backgroundColor: THEME.colors.darkLight2,
+    paddingTop: hp(2),
+    paddingHorizontal: wp(4),
+  },
+  drawerLabel: {
+    fontSize: hp(2),
+    fontWeight: '500',
+    color: THEME.colors.white,
+    marginLeft: wp(2),
   },
   discBtn: {
     width: wp('50'),
     alignSelf: 'center',
     marginTop: hp('5'),
+    marginBottom: hp(2),
+    backgroundColor: THEME.colors.black,
   },
 });

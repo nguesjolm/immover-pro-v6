@@ -10,7 +10,7 @@ export const DashboardCardContent = ({newAppointmentLength}) => {
   const navigation = useNavigation();
 
   const handleNewProperty = () => {
-    navigation.navigate('AddWell');
+    navigation.navigate('AddWell',{ status: 'addbien' });
   };
 
   const handleNewAppointment = () => {

@@ -16,10 +16,11 @@ export const ForgetPasswordScreen = () => {
   const otpCode = useGenerateOtpCode();
 
   return (
-    <KeyboardAwareScrollView style={styles?.container}>
+    <KeyboardAwareScrollView style={styles?.container} contentContainerStyle={styles.contentContainer}>
       <View style={styles.curveRight} />
       <RegisterHeader title={'Récupération de mot de passe'} />
       <View style={styles.content}>
+        <TextVariant text="Veuillez saisir votre numéro whatsap associé à votre compte pour recevoir un code OTP de réinitialisation(ex : 0788892608)"/>
         <InputCustom
           onChangeText={tel => otpCode.handleChange(tel, 'tel')}
           color={THEME.colors.black}
@@ -47,12 +48,17 @@ const styles = StyleSheet.create({
     flex: 1,
     backgroundColor: THEME.colors.white,
   },
+  contentContainer: {
+    flexGrow: 1,
+  },
   content: {
     flex: 1,
     backgroundColor: THEME.colors.white,
     borderTopLeftRadius: univers * 1.3,
     paddingHorizontal: univers,
     paddingTop: univers,
+    // Ajouter un zIndex pour que le contenu soit au-dessus
+    zIndex: 1,
   },
   submitBtn: {
     marginTop: planet,
@@ -61,8 +67,10 @@ const styles = StyleSheet.create({
   curveRight: {
     backgroundColor: THEME.colors.primary,
     width: 200,
-    height: '90%',
+    height: '100%',
     position: 'absolute',
+    top: 0,
+    left: 0,
     zIndex: 0,
   },
 });

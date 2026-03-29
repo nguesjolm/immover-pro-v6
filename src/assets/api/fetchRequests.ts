@@ -14,10 +14,10 @@ export const fetchRequests = async () => {
   return response;
 };
 
-// Prposer une offre
+// Proposer une offre
 export const sendOfferProposed = async formData => {
   const headers = await helperHeaderConfig(true);
-
+  console.log("----------- Proposer une offre :: Lancer la requête  -------------");
   const res = await fetch(`${BASE_URI}/sendOffreToDemande`, {
     method: 'POST',
     headers: {
@@ -28,5 +28,8 @@ export const sendOfferProposed = async formData => {
   });
 
   const response = await res.json();
+  // console.log("response : "+response?.data);
+
+  
   return response;
 };

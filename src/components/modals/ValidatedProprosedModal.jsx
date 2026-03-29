@@ -14,7 +14,7 @@ import {wp} from '../../assets/utils/helperResponsive';
 import {ButtonGeneral} from '../atoms/ButtonGeneral';
 import {ModalCustom} from './ModalCustom';
 import {useNavigation} from '@react-navigation/native';
-import {useQueryClient} from 'react-query';
+import {useQueryClient} from '@tanstack/react-query';
 import {sendOfferProposed} from '../../assets/api/fetchRequests';
 
 export const ValidatedProprosedModal = () => {
@@ -46,8 +46,9 @@ export const ValidatedProprosedModal = () => {
       dispatch(setValidatedProposedModalAction(false));
       dispatch(setSuccessModalAction(true));
       dispatch(
-        setSuccessTextAction('Votre proposition a été envoyée avec succès'),
+        setSuccessTextAction(response?.message),
       );
+      handleModal();
       navigation.navigate('Home');
       queryClient.invalidateQueries('wells');
     } else {
@@ -76,7 +77,8 @@ export const ValidatedProprosedModal = () => {
           textAlign="center"
         />
 
-        <View style={styles.buttons}>
+        {/* Boutons Oui/Non */}
+        <View style={styles.buttonsRow}>
           <ButtonGeneral
             text={'Oui'}
             onPress={handleValidate}
@@ -94,6 +96,15 @@ export const ValidatedProprosedModal = () => {
             backgroundColor={THEME.colors.black}
           />
         </View>
+
+        {/* Bouton Fermer en bas */}
+        <ButtonGeneral
+          text={'Fermer'}
+          onPress={handleModal}
+          btnStyle={styles.closeBtn}
+          width="100%"
+          backgroundColor={THEME.colors.gray}
+        />
       </View>
     </ModalCustom>
   );
@@ -121,10 +132,15 @@ const styles = StyleSheet.create({
     marginTop: wp('3%'),
     height: wp('12%'),
   },
-  buttons: {
+  closeBtn: {
+    marginTop: wp('5%'),
+    height: wp('12%'),
+  },
+  buttonsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     width: '100%',
+    marginTop: wp('3%'),
   },
 });

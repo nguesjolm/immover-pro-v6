@@ -15,8 +15,8 @@ export const IMMOVER_PROFILES = [
 ];
 
 export const WELL_OPTIONS = [
-  {label: 'Validation en cours', key: 'new'},
   {label: 'Disponibles', key: 'dispo'},
+  {label: 'Validation en cours', key: 'new'},
   {label: 'Indisponibles', key: 'indispo'},
   // {label: 'Sponsorisés', key: 'pub'},
 ];

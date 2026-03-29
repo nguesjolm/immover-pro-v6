@@ -32,7 +32,7 @@ export const NewWellItemList = ({ requests, refetch }) => {
 
   // all requests
   const handleRedirectToAllRequests = () => {
-    navigation.navigate('Requests', { screen: 'RequestHistories' });
+    navigation.navigate('Request', { screen: 'RequestHistories' });
   };
 
   const handleDetails = (detail) => {

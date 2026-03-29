@@ -21,7 +21,7 @@ import {resetWellAddDataAction} from '../../../../redux/wells';
 import {ButtonGeneral} from '../../../../components/atoms/ButtonGeneral';
 import {useNavigation} from '@react-navigation/native';
 import {addPreferences} from '../../../../assets/api/fetchPreferences.api';
-import {useQueryClient} from 'react-query';
+import {useQueryClient} from '@tanstack/react-query';
 
 export const AddPreference = () => {
   //

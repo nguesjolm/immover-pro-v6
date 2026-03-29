@@ -16,7 +16,7 @@ import ArrowLeftIcon from '../../../../assets/svgs/ArrowLeftIcon';
 import {useDispatch} from 'react-redux';
 import {BASE_URI_IMAGE} from '../../../../assets/api/app.config';
 import {updateWellStatus} from '../../../../assets/api/fetchWells';
-import {useQueryClient} from 'react-query';
+import {useQueryClient} from '@tanstack/react-query';
 import {
   setSuccessModalAction,
   setSuccessTextAction,

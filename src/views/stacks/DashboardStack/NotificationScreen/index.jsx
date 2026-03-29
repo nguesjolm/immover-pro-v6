@@ -21,7 +21,7 @@ import {
   deleteNotification,
   updateNotificationStatus,
 } from '../../../../assets/api/fetchNotifications';
-import {useQueryClient} from 'react-query';
+import {useQueryClient} from '@tanstack/react-query';
 import {setNotifPreviewModalAction} from '../../../../redux/modals';
 import {setNotifSelectedAction} from '../../../../redux/notifs';
 import {useOfferer} from '../../../../hooks/useOfferer';

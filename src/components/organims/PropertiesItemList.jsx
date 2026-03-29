@@ -15,9 +15,8 @@ export const PropertiesItemList = ({ proposed }) => {
   //
   const dispatch = useDispatch();
   const navigation = useNavigation();
-  const { data, refetch, isLoading } = useWells();
-  const { categoriesSelected, statusSelected, wellsFiltered } =
-    useFilterWells(data);
+  const { data, refetch, isLoading, isFetching  } = useWells();
+  const { categoriesSelected, statusSelected, wellsFiltered } = useFilterWells(data);
 
   const handleDetail = (well) => {
     if (proposed) {
@@ -27,6 +26,21 @@ export const PropertiesItemList = ({ proposed }) => {
       navigation.navigate('WellDetails', { well: { id: well[0]?.id } });
     }
   };
+
+  // Afficher le loader pendant le chargement initial ou le rafraîchissement
+  if (isLoading || isFetching) {
+    return (
+      <View style={styles.loaderContainer}>
+        <ActivityLoader />
+        <TextVariant
+          variant="label"
+          text="Chargement de vos biens..."
+          textAlign="center"
+          marginTop={hp(2)}
+        />
+      </View>
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -74,6 +88,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     marginTop: country,
+    paddingVertical: hp('20'),
+  },
+  loaderContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
     paddingVertical: hp('20'),
   },
 });

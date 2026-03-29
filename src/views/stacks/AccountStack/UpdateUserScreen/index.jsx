@@ -9,7 +9,7 @@ import { KeyboardAwareScrollView } from 'react-native-keyboard-aware-scroll-view
 import { ButtonGeneral } from '../../../../components/atoms/ButtonGeneral';
 import { useNavigation } from '@react-navigation/native';
 import { useOfferer } from '../../../../hooks/useOfferer';
-import { useQueryClient } from 'react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import { updateOfferer } from '../../../../assets/api/auth.api';
 import { useDispatch } from 'react-redux';
 import {

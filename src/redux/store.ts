@@ -17,4 +17,10 @@ export const store = configureStore({
     appointmentsState,
     notifState,
   },
+  // ✅ Désactiver les middlewares de vérification pour les grandes données
+  // middleware: (getDefaultMiddleware) => getDefaultMiddleware({
+  //   serializableCheck: false, // Désactive la vérification de sérialisabilité (pour les images/vidéos)
+  //   immutableCheck: false,     // Désactive la vérification d'immutabilité (optionnel)
+  // }),
+
 });
