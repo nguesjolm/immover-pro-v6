@@ -11,7 +11,9 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "assetBundlePatterns": ["**/*"],
+    "assetBundlePatterns": [
+      "**/*"
+    ],
     "ios": {
       "supportsTablet": true,
       "bundleIdentifier": "com.mpyatech.immoverpro",
@@ -31,13 +33,16 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "permissions": ["android.permission.RECORD_AUDIO"]
+      "permissions": [
+        "android.permission.RECORD_AUDIO",
+        "android.permission.CAMERA"
+      ]
     },
     "plugins": [
       [
         "expo-image-picker",
         {
-          "photosPermission": "Autoriser l'application à accéder à votre camera pour prendre des photos de votre profil et de vos biens immobiliers",
+          "photosPermission": "Autoriser l'application à accéder à votre galerie  pour prendre des photos de votre profil et de vos biens immobiliers",
           "cameraPermission": "Autoriser l'application à accéder à votre camera pour prendre des photos de votre profil et de vos biens immobiliers"
         }
       ],
@@ -49,8 +54,9 @@
             "targetSdkVersion": 35,
             "buildToolsVersion": "35.0.0",
             "usesCleartextTraffic": true,
-            "kotlinVersion": "2.0.21",
-            "kotlinGradlePluginVersion": "2.0.21"
+            "kotlinVersion": "2.1.20",
+            "kotlinGradlePluginVersion": "2.1.20",
+            "kspVersion": "2.1.20-1.0.29"
           },
           "ios": {
             "deploymentTarget": "15.1",
@@ -58,7 +64,8 @@
             "NSPhotoLibraryUsageDescription": "Autoriser l'application à accéder à votre camera pour prendre des photos de votre profil et de vos biens immobiliers"
           }
         }
-      ]
+      ],
+      "expo-video"
     ],
     "web": {
       "favicon": "./assets/favicon.png"

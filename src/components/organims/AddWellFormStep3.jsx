@@ -297,7 +297,7 @@ export const AddWellFormStep3 = () => {
       </View>
 
       {/* Section Vidéo */}
-      <View style={styles.section}>
+      {/* <View style={styles.section}>
         <View style={styles.header}>
           <TextVariant
             text={'Vidéo du bien (optionnel)'}
@@ -401,7 +401,7 @@ export const AddWellFormStep3 = () => {
             </TouchableOpacity>
           )}
         </View>
-      </View>
+      </View> */}
     </KeyboardAwareScrollView>
   );
 };

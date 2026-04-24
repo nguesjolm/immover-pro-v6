@@ -1,5 +1,5 @@
-import React, { useEffect, useMemo } from "react";
-import { StyleSheet, View } from "react-native";
+import React, { useEffect, useMemo, useState } from "react";
+import { StyleSheet, View, Alert } from "react-native";
 import { AppHeader } from "../../../../components/headers/AppHeader";
 import { THEME } from "../../../../styles/theme";
 import { useNavigation } from "@react-navigation/native";
@@ -21,24 +21,229 @@ import { addWell } from "../../../../assets/api/fetchWells";
 import { resetWellAddDataAction } from "../../../../redux/wells";
 import { useQueryClient } from "@tanstack/react-query";
 import { sendOfferProposed } from "../../../../assets/api/fetchRequests";
-import {compressVideo} from '../../../../assets/utils/videoCompressor';
-
-const SALE = "Vente";
-const LOCATION = "Location";
-const PREFINANCEMENT = "PREFINANCEMENT";
-const LAND = "Terrain";
+import { compressVideo, cleanupCompressedVideo } from "../../../../assets/utils/videoCompressor";
 
 export const AddWellScreen = ({ route }) => {
-  //
   const dispatch = useDispatch();
   const navigation = useNavigation();
   const queryClient = useQueryClient();
-  // const status = route?.params?.status;
   const status = route?.params?.status;
   const wellAdd = useSelector((s) => s.wellState.wellAddData);
   const requestSelect = useSelector((s) => s.requestState.requestSelected);
-  const [currentStep, setCurrentStep] = React.useState(1);
-  const [loading, setLoading] = React.useState(false);
+  const [currentStep, setCurrentStep] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [isCompressing, setIsCompressing] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+
+  const LOCATION = "Location";
+  const TERRAIN = "TERRAIN";
+
+  // Validation étape 1 (inchangée)
+  const validateStep1 = () => {
+    const { operations, categories_Biens, pays, villes, commune_quartiers } = wellAdd;
+
+    if (operations?.type_operation?.toUpperCase() === LOCATION?.toUpperCase() &&
+        categories_Biens?.nom_categorie?.toUpperCase() === TERRAIN) {
+      dispatch(setErrorModalAction(true));
+      dispatch(
+        setErrorTextAction(
+          "Un terrain ne peut pas être en location, veuillez choisir un autre type d'opération"
+        )
+      );
+      return false;
+    }
+
+    if (operations?.type_operation &&
+        categories_Biens?.nom_categorie &&
+        pays?.nom &&
+        villes?.nom &&
+        commune_quartiers?.nom) {
+      return true;
+    }
+
+    dispatch(setErrorModalAction(true));
+    dispatch(setErrorTextAction("Veuillez remplir tous les champs obligatoires"));
+    return false;
+  };
+
+  // Validation étape 2 (inchangée)
+  const validateStep2 = () => {
+    const { operations, categories_Biens, pieces, loyer, montant_vente, description, superficie } = wellAdd;
+    const isLocation = operations?.type_operation?.toUpperCase() === LOCATION.toUpperCase();
+    const isTerrain = categories_Biens?.nom_categorie?.toUpperCase() === TERRAIN;
+
+    if (isLocation) {
+      if (pieces && loyer && description) {
+        return true;
+      }
+      dispatch(setErrorModalAction(true));
+      dispatch(setErrorTextAction("Veuillez remplir tous les champs obligatoires (pièces, loyer, description)"));
+      return false;
+    }
+
+    if (!isLocation && !isTerrain) {
+      if (pieces && montant_vente && description && superficie) {
+        return true;
+      }
+      dispatch(setErrorModalAction(true));
+      dispatch(setErrorTextAction("Veuillez remplir tous les champs obligatoires"));
+      return false;
+    }
+
+    if (!isLocation && isTerrain) {
+      if (montant_vente && description && superficie) {
+        return true;
+      }
+      dispatch(setErrorModalAction(true));
+      dispatch(setErrorTextAction("Veuillez remplir tous les champs obligatoires"));
+      return false;
+    }
+
+    dispatch(setErrorModalAction(true));
+    dispatch(setErrorTextAction("Veuillez remplir tous les champs obligatoires"));
+    return false;
+  };
+
+  // ✅ Préparation du FormData avec vidéo déjà compressée
+  const prepareFormData = async () => {
+    const formData = new FormData();
+    
+    // Ajouter les champs de base
+    formData.append('operations', wellAdd.operations?.id);
+    formData.append('categories_Biens', wellAdd.categories_Biens?.id);
+    formData.append('pays', 1);
+    formData.append('villes', wellAdd.villes?.id);
+    formData.append('commune_quartiers', wellAdd.commune_quartiers?.id);
+    formData.append('zone_precise', wellAdd.zone_precise || "");
+    formData.append('longitude', null);
+    formData.append('largitude', null);
+    formData.append('description', wellAdd.description || "");
+    formData.append('pieces', wellAdd.pieces || 0);
+    formData.append('loyer', wellAdd.loyer || 0);
+    formData.append('montant_vente', wellAdd.montant_vente || 0);
+    formData.append('document', wellAdd.document || "");
+    formData.append('superficie', wellAdd.superficie || 0);
+
+    // ✅ Ajouter les images (déjà en base64)
+    if (wellAdd.images && wellAdd.images.length > 0) {
+      wellAdd.images.forEach((image, index) => {
+        if (image?.path) {
+          formData.append(`images_${index + 1}`, {
+            uri: image.path,
+            name: image.filename || `image_${index + 1}.jpg`,
+            type: image.mime || 'image/jpeg',
+          });
+        }
+      });
+    }
+
+    // ✅ Ajouter la vidéo (déjà compressée dans AddWellFormStep3)
+    if (wellAdd.video?.uri) {
+      console.log("📹 Ajout de la vidéo compressée au FormData");
+      console.log(`   Taille: ${(wellAdd.video.compressedSize / (1024 * 1024)).toFixed(1)} MB`);
+      console.log(`   Compressée: ${wellAdd.video.isCompressed ? 'Oui' : 'Non'}`);
+      
+      formData.append('video', {
+        uri: wellAdd.video.uri,
+        name: wellAdd.video.name || 'video.mp4',
+        type: wellAdd.video.type || 'video/mp4',
+      });
+    }
+
+    return formData;
+  };
+
+  // ✅ Soumission des données
+  const submitData = async () => {
+    // Vérifier qu'il y a au moins une image
+    if (!wellAdd.images || wellAdd.images.length <= 0) {
+      dispatch(setErrorModalAction(true));
+      dispatch(setErrorTextAction("Veuillez ajouter au moins une image"));
+      return false;
+    }
+
+    // ✅ Avertir si la vidéo est volumineuse
+    if (wellAdd.video && wellAdd.video.compressedSize) {
+      const videoSizeMB = wellAdd.video.compressedSize / (1024 * 1024);
+      if (videoSizeMB > 8) {
+        Alert.alert(
+          "Vidéo volumineuse",
+          `La vidéo fait ${videoSizeMB.toFixed(1)} MB. L'envoi peut prendre plus de temps. Continuer ?`,
+          [
+            { text: "Annuler", style: "cancel" },
+            { text: "Continuer", onPress: () => performSubmission() }
+          ]
+        );
+        return;
+      }
+    }
+
+    await performSubmission();
+  };
+
+  // ✅ Fonction de soumission réelle
+  const performSubmission = async () => {
+    setLoading(true);
+    setUploadProgress(0);
+    dispatch(setErrorModalAction(false));
+    dispatch(setErrorTextAction(""));
+
+    try {
+      const formData = await prepareFormData();
+      
+      console.log("📤 Début de l'envoi au serveur...");
+      
+      let response;
+      if (status === "offered") {
+        formData.append("process", "new");
+        formData.append("demande_id", requestSelect?.demande_id);
+        formData.append("bien_existing", false);
+        
+        response = await sendOfferProposed(formData, wellAdd.operations?.id);
+        
+        if (response?.statuscode === 200) {
+          handleSuccess(response?.message || "Offre envoyée avec succès");
+          return true;
+        } else {
+          throw new Error(response?.message || "Erreur lors de l'envoi de l'offre");
+        }
+      } else {
+        response = await addWell(formData);
+        
+        if (response?.data?.statuscode === 200) {
+          handleSuccess(response?.data?.message || "Bien ajouté avec succès");
+          return true;
+        } else {
+          throw new Error(response?.data?.message || "Erreur lors de l'ajout du bien");
+        }
+      }
+    } catch (error) {
+      console.error("❌ Erreur lors de la soumission:", error);
+      dispatch(setErrorModalAction(true));
+      dispatch(setErrorTextAction(error.message || "Une erreur est survenue"));
+      return false;
+    } finally {
+      setLoading(false);
+      setUploadProgress(0);
+    }
+  };
+
+  // ✅ Gestion du succès
+  const handleSuccess = (message) => {
+    dispatch(setSuccessModalAction(true));
+    dispatch(setSuccessTextAction(message));
+    queryClient.invalidateQueries("wells");
+    
+    // Nettoyer les fichiers temporaires
+    if (wellAdd.video?.uri) {
+      cleanupCompressedVideo(wellAdd.video.uri);
+    }
+    
+    setTimeout(() => {
+      dispatch(resetWellAddDataAction());
+      navigation.goBack();
+    }, 1500);
+  };
 
   const handlePrevious = () => {
     if (currentStep > 1) {
@@ -47,253 +252,26 @@ export const AddWellScreen = ({ route }) => {
   };
 
   const handleNext = async () => {
-    const { operations, categories_Biens, pays, villes, commune_quartiers } = wellAdd;
-
     if (currentStep === 1) {
-      if (
-        operations?.type_operation?.toUpperCase() === LOCATION?.toUpperCase() &&
-        categories_Biens?.nom_categorie?.toUpperCase() === "TERRAIN"
-      ) {
-        dispatch(setErrorModalAction(true));
-        dispatch(
-          setErrorTextAction(
-            "Un terrain ne peut pas être en location, veuillez choisir un autre type d'operation"
-          )
-        );
-      } else if (
-        operations?.type_operation &&
-        categories_Biens?.nom_categorie &&
-        pays?.nom &&
-        villes?.nom &&
-        commune_quartiers?.nom
-      ) {
+      const isValid = validateStep1();
+      if (isValid) {
         setCurrentStep(currentStep + 1);
-      } else {
-        dispatch(setErrorModalAction(true));
-        dispatch(
-          setErrorTextAction("Veuillez remplir tous les champs obligatoires")
-        );
       }
+      return;
     }
 
     if (currentStep === 2) {
-      // IS LOCATION
-      if (operations?.type_operation?.toUpperCase() === "LOCATION") {
-        if (wellAdd?.pieces && wellAdd?.loyer && wellAdd?.description) {
-          setCurrentStep(currentStep + 1);
-        } else {
-          dispatch(setErrorModalAction(true));
-          dispatch(
-            setErrorTextAction("Veuillez remplir tous les champs obligatoires")
-          );
-        }
-      }
-
-      // IS SALE WITHOUT LAND
-      if (
-        operations?.type_operation?.toUpperCase() !== "LOCATION" &&
-        categories_Biens?.nom_categorie?.toUpperCase() !== "TERRAIN"
-      ) {
-        if (
-          wellAdd?.pieces &&
-          wellAdd?.montant_vente &&
-          wellAdd?.description &&
-          wellAdd?.superficie
-        ) {
-          setCurrentStep(currentStep + 1);
-        } else {
-          console.log("here");
-          dispatch(setErrorModalAction(true));
-          dispatch(
-            setErrorTextAction("Veuillez remplir tous les champs obligatoires")
-          );
-        }
-      }
-    }
-
-    // IS SALE WITH LAND
-    if (
-      currentStep === 2 &&
-      operations?.type_operation?.toUpperCase() !== "LOCATION" &&
-      categories_Biens?.nom_categorie?.toUpperCase() === "TERRAIN"
-    ) {
-      if (
-        wellAdd?.montant_vente &&
-        wellAdd?.description &&
-        wellAdd?.superficie
-      ) {
+      const isValid = validateStep2();
+      if (isValid) {
         setCurrentStep(currentStep + 1);
-      } else {
-        console.log("here ici");
-        dispatch(setErrorModalAction(true));
-        dispatch(
-          setErrorTextAction("Veuillez remplir tous les champs obligatoires")
-        );
       }
+      return;
     }
 
-
-    // SEND DATA TO API
     if (currentStep === 3) {
-      if (wellAdd?.images.length <= 0) {
-        dispatch(setErrorModalAction(true));
-        dispatch(setErrorTextAction("Veuillez ajouter au moins une image"));
-      } else {
-        setLoading(true);
-        dispatch(setErrorModalAction(false));
-        dispatch(setErrorTextAction(""));
-        
-        const payload = {
-          operations: operations?.id,
-          categories_Biens: categories_Biens?.id,
-          pays: 1,
-          villes: villes?.id,
-          commune_quartiers: commune_quartiers?.id,
-          zone_precise: wellAdd?.zone_precise || "",
-          longitude: null,
-          largitude: null,
-          description: wellAdd?.description || "",
-          pieces: wellAdd?.pieces || 0,
-          loyer: wellAdd?.loyer || 0,
-          montant_vente: wellAdd?.montant_vente,
-          document: wellAdd?.document || "",
-          superficie: wellAdd?.superficie || 0,
-          images_1: wellAdd?.images[0] || null,
-          images_2: wellAdd?.images[1] || null,
-          images_3: wellAdd?.images[2] || null,
-          images_4: wellAdd?.images[3] || null,
-          images_5: wellAdd?.images[4] || null,
-          images_6: wellAdd?.images[5] || null,
-          images_7: wellAdd?.images[6] || null,
-          images_8: wellAdd?.images[7] || null,
-          images_9: wellAdd?.images[8] || null,
-          video: wellAdd?.video || null,
-        };
-
-        // console.log("====================================");
-        // console.log("payload", payload);
-        // console.log("====================================");
-
-        // formData
-        const formData = new FormData();
-        formData.append("operations", payload?.operations);
-        formData.append("categories_Biens", payload?.categories_Biens);
-        formData.append("pays", payload?.pays);
-        formData.append("villes", payload?.villes);
-        formData.append("commune_quartiers", payload?.commune_quartiers);
-        formData.append("zone_precise", payload?.zone_precise);
-        formData.append("longitude", payload?.longitude);
-        formData.append("largitude", payload?.largitude);
-        formData.append("description", payload?.description);
-
-        formData.append("pieces", payload?.pieces);
-        formData.append("loyer", payload?.loyer);
-        formData.append("montant_vente", payload?.montant_vente);
-        formData.append("document", payload?.document);
-        formData.append("superficie", payload?.superficie);
-        // formData.append("video", payload?.video);
-
-        // map images
-        wellAdd?.images?.map((image, index) => {
-          formData.append(`images_${index + 1}`, {
-            uri: image?.path,
-            name: image?.filename || `image_${index + 1}`,
-            type: image?.mine,
-          });
-        });
-
-        // Pour la vidéo
-        const compressedVideo = await compressVideo(wellAdd.video.uri, { maxSizeMB: 10 });
-        if (!compressedVideo) {
-          dispatch(setErrorTextAction("La vidéo est trop volumineuse (max 10MB)"));
-          setLoading(false);
-          return;
-        }
-        // Ajouter au formData
-        formData.append('video', {
-          uri: compressedVideo.uri,
-          name: compressedVideo.name,
-          type: compressedVideo.type,
-        });
-
-
-        console.log("response_status : "+status);
-
-        let response = null;
-        if (status === "offered") {
-          formData.append("process", "new");
-          formData.append("demande_id", requestSelect?.demande_id);
-          formData.append("bien_existing", false);
-          response = await sendOfferProposed(formData, payload?.operations);
-          console.log("=============================");
-          if (response?.statuscode === 200) {
-            // Succès
-            console.log("Offre envoyée avec succès");
-            dispatch(setSuccessModalAction(true));
-            dispatch(
-              setSuccessTextAction(
-                response?.message
-              )
-            );
-            // navigation.navigate("Home");
-            queryClient.invalidateQueries("wells");
-            // Navigue vers la liste
-            navigation.goBack();
-          } else {
-            // Erreur
-            setLoading(false);
-            dispatch(setErrorModalAction(true));
-            console.error("Erreur:", response?.message);
-            dispatch(
-              setErrorTextAction(
-                response?.message
-              )
-            );
-          }
-          console.log("=============================");
-        } else {
-          response = await addWell(formData);
-          console.log("response_addBiens : "+response?.data?.message);
-          // console.log("response_addBiens : "+response);
-          console.log("===================");
-        }
-       
-
-        if (response?.data?.statuscode === 200) {
-          setLoading(false);
-          dispatch(resetWellAddDataAction());
-          if (status !== "offered") {
-            dispatch(setSuccessModalAction(true));
-            dispatch(
-              setSuccessTextAction(response?.data?.message)
-            );
-            // navigation.navigate("Well");
-            queryClient.invalidateQueries("wells");
-            // Navigue vers la liste
-            navigation.goBack();
-
-          } else {
-            dispatch(setSuccessModalAction(true));
-            dispatch(
-              setSuccessTextAction(
-                response?.data?.message
-              )
-            );
-            // navigation.navigate("Home");
-            queryClient.invalidateQueries("wells");
-            // Navigue vers la liste
-            navigation.goBack();
-          }
-        }
-      }
+      await submitData();
     }
-
   };
-
-  useEffect(() => {
-    console.log("Route params:", route?.params);
-    console.log("Status from params:", route?.params?.status);
-  }, [route]);
 
   const addWellForm = useMemo(() => {
     switch (currentStep) {
@@ -327,16 +305,22 @@ export const AddWellScreen = ({ route }) => {
             btnStyle={styles.buttonText}
             text={"RETOUR"}
             onPress={handlePrevious}
-            disabled={currentStep === 1}
+            disabled={currentStep === 1 || loading || isCompressing}
             backgroundColor={THEME.colors.gray}
           />
         )}
         <ButtonGeneral
           btnStyle={currentStep === 1 ? { width: "100%" } : { width: "50%" }}
-          text={currentStep < 3 ? "SUIVANT" : "SOUMETTRE"}
+          text={
+            loading 
+              ? `Envoi en cours... ${uploadProgress > 0 ? uploadProgress + '%' : ''}`
+              : currentStep < 3 
+                ? "SUIVANT" 
+                : "SOUMETTRE"
+          }
           onPress={handleNext}
-          loading={loading}
-          disabled={loading}
+          loading={loading || isCompressing}
+          disabled={loading || isCompressing}
           backgroundColor={
             currentStep < 3 ? THEME.colors.primary : THEME.colors.green
           }
@@ -352,7 +336,10 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingHorizontal: country,
   },
-
+  formContainer: {
+    flex: 1,
+    marginBottom: wp("20%"),
+  },
   buttonsContainer: {
     bottom: 0,
     flexDirection: "row",
@@ -363,6 +350,7 @@ const styles = StyleSheet.create({
     width: "100%",
     backgroundColor: THEME.colors.white,
     alignSelf: "center",
+    paddingHorizontal: country,
   },
   buttonText: {
     width: wp("45%"),

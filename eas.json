@@ -19,10 +19,18 @@
   },
   "submit": {
     "production": {
-      "ios":{
-        "appleId":"devdodo225@gmail.com",
-        "ascAppId":"6478608071",
-        "appleTeamId":"GM667874QZ"
+      "android": {
+        "track": "internal"
+      },
+      "ios": {
+        "appleId": "devdodo225@gmail.com",
+        "ascAppId": "6478608071",
+        "appleTeamId": "GM667874QZ"
+      }
+    },
+    "production-store": {
+      "android": {
+        "track": "production"
       }
     }
   }
